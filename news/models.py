@@ -19,11 +19,12 @@ class Docu:
     def load(self):
         kn = 20
         folder_name = "mini_newsgroups"
-        folders = os.listdir(os.path.join(os.getcwd(), folder_name))
+        folders = None
+        folders = os.listdir(os.path.join(os.path.dirname(__file__), folder_name))
         data = Docu()
 
         for n in range(len(folders)):
-            files = glob.glob(("%s/%s/*" % (folder_name, folders[n])))
+            files = glob.glob(("%s/%s/*" % (os.path.join(os.path.dirname(__file__), folder_name), folders[n])))
             for f in files:
                 with open(f, "r", encoding="utf-8", errors='ignore') as fin:
                     data.append(fin.read(),n)
@@ -83,8 +84,10 @@ class Hierarchical(Model):
     def __init__(self):
         super().__init__()
         self.draw = None
+        self.p = 5
 
-    def fit(self, draw=False):
+    def fit(self, draw=False, p=5):
+        self.p = p
         self.draw = draw
         hie = None
         if draw: # for drawing
@@ -117,5 +120,5 @@ class Hierarchical(Model):
         linkage_matrix = np.column_stack([self.model.children_, self.model.distances_,
                                           counts]).astype(float)
 
-        dendrogram(linkage_matrix, truncate_mode='level', p=4)
+        dendrogram(linkage_matrix, truncate_mode='level', p=self.p)
         plt.show()

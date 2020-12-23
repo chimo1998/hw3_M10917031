@@ -15,10 +15,9 @@ class Docu:
         self.cate = None
 
     def load(self):
-        data = arff.loadarff('./HTRU2/HTRU_2.arff')
+        data = arff.loadarff('%s/HTRU2/HTRU_2.arff' % os.path.dirname(__file__))
         df = pd.DataFrame(data[0])
         self.X = df.drop('class', axis=1)
-        self.impute()
         self.normalize()
         self.cate = df['class'].astype(int)
         return self.X
@@ -26,11 +25,6 @@ class Docu:
     def normalize(self):
         for i in self.X.columns:
             self.X[i] = (self.X[i] - self.X[i].min()) / (self.X[i].max() - self.X[i].min())
-
-    def impute(self):
-        imp = SimpleImputer(strategy='mean')
-        imp.fit(self.X)
-        self.X = pd.DataFrame(imp.fit_transform(self.X), columns=self.X.columns)
 
 class Model:
     def __init__(self, nc=2):
@@ -84,8 +78,10 @@ class Hierarchical(Model):
     def __init__(self):
         super().__init__()
         self.draw = None
+        self.p = 5
 
-    def fit(self, draw=False):
+    def fit(self, draw=False, p=5):
+        self.p = p
         self.draw = draw
         hie = None
         if draw: # for drawing
@@ -118,5 +114,5 @@ class Hierarchical(Model):
         linkage_matrix = np.column_stack([self.model.children_, self.model.distances_,
                                           counts]).astype(float)
 
-        dendrogram(linkage_matrix, truncate_mode='level', p=4)
+        dendrogram(linkage_matrix, truncate_mode='level', p=self.p)
         plt.show()

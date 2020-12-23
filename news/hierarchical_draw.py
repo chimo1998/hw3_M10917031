@@ -1,5 +1,5 @@
 import models
 
 hie = models.Hierarchical()
-hie.fit(draw=True)
+hie.fit(draw=True, p=5)
 hie.dendrogram()
